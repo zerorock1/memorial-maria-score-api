@@ -15,7 +15,7 @@ router.post('/', async (req, res) => {
       members: members.map(m => ({
         _id: new ObjectId(m._id),
         name: m.name,
-        club: m.club
+        members: m.members
       }))
     };
 
@@ -74,9 +74,13 @@ router.put('/:id', async (req, res) => {
       name: name,
       members: members.map(m => ({
         _id: new ObjectId(m._id),
+        club: m.club,
+        email: m.email,
+        license: m.license,
         name: m.name,
-        club: m.club
-      }))
+        firstName: m.firstName,
+        lastName: m.lastName,
+      })),
     };
 
     const result = await db.collection('teams').updateOne(
