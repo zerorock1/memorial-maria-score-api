@@ -83,7 +83,7 @@ router.get('/:id', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   const { id } = req.params; // Obtener el ID de los parámetros de la ruta
-  const { name, members } = req.body; // Extraer datos del cuerpo de la solicitud
+  const { name, members , scores } = req.body; // Extraer datos del cuerpo de la solicitud
   const db = req.db;
 
   try {
@@ -100,7 +100,7 @@ router.put('/:id', async (req, res) => {
               lastName: m.lastName,
               category:m.category
           })),
-          scores: [] // Si necesitas actualizar scores, puedes hacerlo aquí
+          scores: scores // Si necesitas actualizar scores, puedes hacerlo aquí
       };
 
       // Actualizar la ronda en la base de datos

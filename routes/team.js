@@ -80,6 +80,7 @@ router.put('/:id', async (req, res) => {
         name: m.name,
         firstName: m.firstName,
         lastName: m.lastName,
+        category:m.category
       })),
     };
 
