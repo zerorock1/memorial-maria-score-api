@@ -10,7 +10,7 @@ const { ObjectId } = require('mongodb');
 router.get('/', async (req, res) => {
   const db = req.db;
   try {
-    const teams = await db.collection('participantes').find().toArray();
+    const teams = await db.collection('participantes').find().sort({ club: 1 }).toArray();
     res.status(200).send(teams);
   } catch (error) {
     res.status(400).send({

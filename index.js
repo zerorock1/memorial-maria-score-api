@@ -37,6 +37,7 @@ const ExportRoutes = require('./routes/export');
 const TeamRoutes = require('./routes/team');
 const ParticipantesRoutes = require('./routes/participante');
 const RondasRoutes = require('./routes/ronda');
+const RankingsRoutes = require('./routes/ranking');
 
 // Middleware to pass db instance to routes
 app.use((req, res, next) => {
@@ -57,6 +58,7 @@ app.use('/api/export', ExportRoutes);
 app.use('/api/team', TeamRoutes);
 app.use('/api/participante', ParticipantesRoutes);
 app.use('/api/ronda', RondasRoutes);
+app.use('/api/rankings', RankingsRoutes);
 
 // Connect to MongoDB and start the server
 const startServer = async () => {

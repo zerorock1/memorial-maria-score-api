@@ -3,38 +3,63 @@ const router = express.Router();
 const { ObjectId } = require('mongodb');
 
 
+const calculateRankings = (sport, rounds) => {
+  const scoresByAthlete = {};
 
-router.post('/', async (req, res) => {
-    const { name, sport, final, members, scores } = req.body;
-    const db = req.db;
-    try {
-      const ronda = {
-        name: name,
-        sport:sport,
-        final:final,
-        members: members.map(m => ({
-                _id: new ObjectId(m._id),
-                club: m.club,
-                email: m.email,
-                license: m.license,
-                name: m.name,
-                firstName: m.firstName,
-                lastName: m.lastName,
-        })),
-        scores:[]
-      };
-      const result = await db.collection('rondas').insertOne(ronda);
-      res.status(201).send({
-        message: 'Ronda creado',
-        teamId: result.insertedId
-      });
-    } catch (error) {
-      res.status(400).send({
-        message: 'Error al crear la ronda',
-        error: error.message
+  rounds.forEach(round => {
+    if (round.sport === sport) {
+      round.scores.forEach(scoreEntry => {
+        const athleteId = scoreEntry.gimnasta._id;
+        const scoreValues = Object.values(scoreEntry.score);
+
+        const totalScore = scoreValues.reduce((acc, score) => acc + score, 0);
+
+        if (scoresByAthlete[athleteId]) {
+          scoresByAthlete[athleteId].total += totalScore;
+          scoresByAthlete[athleteId].scores.push(...scoreValues);
+        } else {
+          scoresByAthlete[athleteId] = {
+            athlete: scoreEntry.gimnasta,
+            total: totalScore,
+            scores: [...scoreValues]
+          };
+        }
       });
     }
   });
+
+  // Function to calculate median
+  const calculateMedian = (scores) => {
+    const sortedScores = scores.slice().sort((a, b) => a - b);
+    const mid = Math.floor(sortedScores.length / 2);
+
+    if (sortedScores.length % 2 === 0) {
+      return (sortedScores[mid - 1] + sortedScores[mid]) / 2;
+    } else {
+      return sortedScores[mid];
+    }
+  };
+
+  // Function to calculate mean (average)
+  const calculateMean = (scores) => {
+    const total = scores.reduce((acc, score) => acc + score, 0);
+    return total / scores.length;
+  };
+
+  // Add median and mean to each athlete's scores and then sort by total score
+  const rankings = Object.values(scoresByAthlete).map(athleteData => {
+    const median = calculateMedian(athleteData.scores);
+    const mean = calculateMean(athleteData.scores);
+    return {
+      ...athleteData,
+      median,
+      mean
+    };
+  }).sort((a, b) => b.total - a.total);
+
+  return rankings;
+};
+
 
 
 
