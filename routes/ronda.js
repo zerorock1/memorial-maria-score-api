@@ -2,9 +2,6 @@ const express = require('express');
 const router = express.Router();
 const { ObjectId } = require('mongodb');
 
-
-
-
 router.post('/', async (req, res) => {
   const { name, sport, final, members, scores } = req.body;
   const db = req.db;
@@ -78,10 +75,18 @@ router.get('/:id', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   const { id } = req.params; // Obtener el ID de los parámetros de la ruta
-  const { name, members , scores  } = req.body; // Extraer datos del cuerpo de la solicitud
+  const { name, members , score  } = req.body; // Extraer datos del cuerpo de la solicitud
   const db = req.db;
 
   try {
+
+    const newScore = {
+      ...score,
+      _id: new ObjectId() // Añadir el campo _id al score
+  };
+
+
+
       // Crear un objeto de actualización
       const updateData = {
           name,
@@ -95,15 +100,16 @@ router.put('/:id', async (req, res) => {
               lastName: m.lastName,
               category:m.category,
               gender:m.gender
-          })),
-          scores: scores
-        
+          }))
       };
 
       // Actualizar la ronda en la base de datos
       const result = await db.collection('rondas').updateOne(
           { _id: new ObjectId(id) }, // Filtrar por ID
-          { $set: updateData } // Actualizar solo los campos especificados
+          { 
+            $set: updateData,
+            $push: { scores: newScore }
+          } // Actualizar solo los campos especificados
       );
 
       if (result.modifiedCount === 0) {
