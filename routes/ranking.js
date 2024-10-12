@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { ObjectId } = require('mongodb');
 
-function calcularRanking(data) {
+function calcularRankingTrampolin(data) {
   // Función para calcular la puntuación de un atleta
   function calcularNotaEjecucion(scores) {
       const ejecuciones = scores.filter(score => score.tipe === 'ejecucion');
@@ -50,11 +50,9 @@ function calcularRanking(data) {
   data.forEach((item) => {
       item.members.forEach(atleta => {
         const atletaId = atleta._id.$oid;
-    
 
         const scores = item.scores.filter(score => score.gimnasta._id.$oid === atletaId);
         
-
         const notaEjecucion = calcularNotaEjecucion(scores);
         const notaDificultad = calcularNotaDificultad(scores);
         const notaVuelo = calcularNotaVuelo(scores);
@@ -62,7 +60,7 @@ function calcularRanking(data) {
     
         const puntuacionTotal = notaEjecucion + notaDificultad + notaVuelo - penalizacion;
     
-        ranking[`${atleta.firstName} ${atleta.lastName} ${atleta.name} (${atleta.club})`] = puntuacionTotal;
+        ranking[`${atleta.firstName} ${atleta.lastName} ${atleta.name}||(${atleta.club})`] = puntuacionTotal;
     });
   })
 
@@ -73,15 +71,36 @@ function calcularRanking(data) {
 }
   
 
+function calcularRankingDoble(data) { return }
+function calcularRankingSincro(data) { return }
 
 router.get('/:sport', async (req, res) => {
     const sport = req.params.sport;
     const db = req.db;
+
+    let rankings;
     
     try {
 
         const rondas = await db.collection('rondas').find({ sport: sport }).toArray();
-        const rankings = calcularRanking(rondas);
+        
+      switch (sport) {
+        case 'trp':
+          rankings = calcularRankingTrampolin(rondas);
+          break;
+
+        case 'dmt':
+          rankings = calcularRankingDoble(rondas);
+          break;
+
+        case 'sin':
+          rankings = calcularRankingSincro(rondas);
+          break;
+      }
+        
+
+
+        
 
         res.status(200).send(rankings);
       } catch (error) {

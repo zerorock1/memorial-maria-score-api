@@ -95,12 +95,22 @@ router.get('/participantes-by-sport/:sport', async (req, res) => {
   const db = req.db;
   const { sport } = req.params; // Obtener el parámetro 'sport' desde la URL
 
+  let participantes;
+
   try {
     // Buscar participantes donde el deporte coincida con el parámetro 'sport'
-    const participantes = await db.collection('participantes')
-    .find({ sport: { $in: [sport] } })
-    .sort({ firstName: 1 })
-    .toArray();
+    if(sport != 'sin'){
+      participantes = await db.collection('participantes')
+      .find({ sport: { $in: [sport] } })
+      .sort({ firstName: 1 })
+      .toArray();
+    } else{
+      participantes = await db.collection('teams')
+      .find()
+      .sort({ name: 1 })
+      .toArray();
+    }
+
 
     if (participantes.length === 0) {
       return res.status(404).send({ message: 'No se encontraron participantes para este deporte' });
