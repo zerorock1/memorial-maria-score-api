@@ -11,7 +11,7 @@ app.use(helmet());
 
 const corsOptions = {
   //origin: 'https://www.memorialmariahg.org',
-  origin: 'http://localhost:3000'
+  origin: 'http://192.168.1.31:3000'
 };
 
 app.use(cors(corsOptions));
@@ -71,7 +71,7 @@ const startServer = async () => {
 
     // Start the Express server
     app.listen(PORT, () => {
-      console.log(`Server is running on http://localhost:${PORT}`);
+      console.log(`Server is running on http://192.168.1.31:${PORT}`);
     });
   } catch (err) {
     console.error('Unable to connect to the database:', err);

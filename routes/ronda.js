@@ -121,7 +121,8 @@ router.put('/:id', async (req, res) => {
               firstName: m.firstName,
               lastName: m.lastName,
               category:m.category,
-              gender:m.gender
+              gender:m.gender,
+              order:m.order
           }))
       };
 
@@ -174,7 +175,8 @@ router.put('/change-data/:id', async (req, res) => {
               firstName: m.firstName,
               lastName: m.lastName,
               category:m.category,
-              gender:m.gender
+              gender:m.gender,
+              order:m.order
           }))
       };
 

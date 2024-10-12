@@ -15,6 +15,7 @@ function calcularRankingTrampolin(data) {
           }
           // Ordenamos las puntuaciones y eliminamos el mínimo y el máximo
           sScores.sort((a, b) => a - b);
+          
           if (sScores.length > 2) {
               sScores.splice(0, 1); // Eliminar el mínimo
               sScores.splice(-1, 1); // Eliminar el máximo

@@ -6,12 +6,13 @@ const { ObjectId } = require('mongodb');
 
 // Crear un nuevo equipo
 router.post('/', async (req, res) => {
-  const { name, members } = req.body;
+  const { name, order , members } = req.body;
   const db = req.db;
 
   try {
     const team = {
       name: name,
+      order:order,
       members: members.map(m => ({
         _id: new ObjectId(m._id),
         name: m.name,
