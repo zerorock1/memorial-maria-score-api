@@ -79,7 +79,10 @@ router.get('/config-participante/:sport', async (req, res) => {
 router.get('/', async (req, res) => {
   const db = req.db;
   try {
-    const teams = await db.collection('participantes').find().sort({ club: 1 }).toArray();
+    const teams = await db.collection('participantes').find()
+    .collation({ locale: 'es', strength: 1 }) 
+    .sort({ club: 1 })
+    .toArray();
     res.status(200).send(teams);
   } catch (error) {
     res.status(400).send({
@@ -102,11 +105,13 @@ router.get('/participantes-by-sport/:sport', async (req, res) => {
     if(sport != 'sin'){
       participantes = await db.collection('participantes')
       .find({ sport: { $in: [sport] } })
+      .collation({ locale: 'es', strength: 1 }) 
       .sort({ firstName: 1,lastName: 1 })
       .toArray();
     } else{
       participantes = await db.collection('teams')
       .find()
+      .collation({ locale: 'es', strength: 1 }) 
       .sort({ name: 1 })
       .toArray();
     }
@@ -137,7 +142,8 @@ router.get('/participantes-by-sport-sincro/:sport', async (req, res) => {
   
       const participantes = await db.collection('participantes')
       .find({ sport: { $in: [sport] } })
-      .sort({ firstName: 1,lastName: 1 })
+      .collation({ locale: 'es', strength: 1 }) 
+      .sort({ firstName: 1 })
       .toArray();
 
 
