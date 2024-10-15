@@ -9,9 +9,13 @@ const PORT = process.env.PORT || 4000;
 
 app.use(helmet());
 
+// sin barra al final
 const corsOptions = {
   //origin: 'https://www.memorialmariahg.org',
-  origin: 'http://192.168.1.31:3000'
+  origin: 'http://localhost:3000',
+  //origin: '*',
+  
+  
 };
 
 app.use(cors(corsOptions));
@@ -39,6 +43,7 @@ const ParticipantesRoutes = require('./routes/participante');
 const RondasRoutes = require('./routes/ronda');
 const RankingsRoutes = require('./routes/ranking');
 const ScoresRoutes = require('./routes/score');
+const ScoringRoutes = require('./routes/scoring');
 
 // Middleware to pass db instance to routes
 app.use((req, res, next) => {
@@ -61,6 +66,7 @@ app.use('/api/participante', ParticipantesRoutes);
 app.use('/api/ronda', RondasRoutes);
 app.use('/api/rankings', RankingsRoutes);
 app.use('/api/score', ScoresRoutes);
+app.use('/api/scoring', ScoringRoutes);
 
 // Connect to MongoDB and start the server
 const startServer = async () => {
@@ -71,7 +77,7 @@ const startServer = async () => {
 
     // Start the Express server
     app.listen(PORT, () => {
-      console.log(`Server is running on http://192.168.1.31:${PORT}`);
+      console.log(`Server is running on http://localhost:${PORT}`);
     });
   } catch (err) {
     console.error('Unable to connect to the database:', err);

@@ -7,7 +7,7 @@ const { ObjectId } = require('mongodb');
 
 router.put('/siguiente-participante/:sport', async (req, res) => {
   const { sport } = req.params; // Obtener el ID de los parámetros de la ruta
-  const { gimnasta , ronda , salto } = req.body; // Extraer datos del cuerpo de la solicitud
+  const { gimnasta , ronda , salto , uuid } = req.body; // Extraer datos del cuerpo de la solicitud
   const db = req.db;
 
   // Buscar configuración para el deporte
@@ -23,7 +23,8 @@ router.put('/siguiente-participante/:sport', async (req, res) => {
     const updateData = {
       gimnasta: gimnasta,
       ronda:ronda,
-      salto:salto
+      salto:salto,
+      uuid:uuid
     };
 
     // Actualizar la configuración en la base de datos
