@@ -26,7 +26,7 @@ function processTrp(rondas) {
           tipe: 'ejecucion',
           gimnasta: member,
           score: fakeEjecucionTrampolin(),
-          verified: false,
+          verified: true,
           salto: null,
           juez: i,
           date: new Date(),
@@ -38,7 +38,7 @@ function processTrp(rondas) {
         tipe: 'dificultad',
         gimnasta: member,
         score: fakeDificultadTrampolin(),
-        verified: false,
+        verified: true,
         salto: null,
         juez: 1,
         date: new Date(),
@@ -49,7 +49,7 @@ function processTrp(rondas) {
         tipe: 'vuelo',
         gimnasta: member,
         score: fakeVueloTrampolin(),
-        verified: false,
+        verified: true,
         salto: null,
         juez: 1,
         date: new Date(),
@@ -60,7 +60,7 @@ function processTrp(rondas) {
         tipe: 'penalizacion',
         gimnasta: member,
         score: fakePenalizacionTrampolin(),
-        verified: false,
+        verified: true,
         salto: null,
         juez: 1,
         date: new Date(),
@@ -72,6 +72,70 @@ function processTrp(rondas) {
     saveScore(puntuaciones, ronda._id);
   });
 }
+
+
+
+function processDmt(rondas) {
+  rondas.forEach(ronda => {
+    const puntuaciones = []; // Move this inside the loop to reset for each ronda
+    ronda.members.forEach(member => {
+        for(let salto = 1 ; salto <= 2 ; salto++){
+          let newScoreEntryEjecucion = {};
+          for (let i = 1; i <= 4; i++) {
+            newScoreEntryEjecucion = {
+              tipe: 'ejecucion',
+              gimnasta: member,
+              score: fakeEjecucionMiniTrump(),
+              verified: true,
+              salto: salto,
+              juez: i,
+              date: new Date(),
+            };
+            puntuaciones.push(newScoreEntryEjecucion);
+          }
+    
+          const newScoreEntryDificultad = {
+            tipe: 'dificultad',
+            gimnasta: member,
+            score: fakeDificultadTrampolin(),
+            verified: true,
+            salto: salto,
+            juez: 1,
+            date: new Date(),
+          };
+          puntuaciones.push(newScoreEntryDificultad);
+    
+          const newScoreEntryVuelo = {
+            tipe: 'vuelo',
+            gimnasta: member,
+            score: fakeVueloTrampolin(),
+            verified: true,
+            salto: salto,
+            juez: 1,
+            date: new Date(),
+          };
+          puntuaciones.push(newScoreEntryVuelo);
+    
+          const newScoreEntryPenalizacion = {
+            tipe: 'penalizacion',
+            gimnasta: member,
+            score: fakePenalizacionTrampolin(),
+            verified: true,
+            salto: salto,
+            juez: 1,
+            date: new Date(),
+          };
+          puntuaciones.push(newScoreEntryPenalizacion); // Add Penalizacion score
+        }
+    });
+
+    // Insert scores in DB for each ronda
+    saveScore(puntuaciones, ronda._id);
+  });
+}
+
+
+
 
 async function saveScore(scores, id) {
   const result = await db.collection('rondas').updateOne(
@@ -86,14 +150,45 @@ async function saveScore(scores, id) {
   console.log("Scores inserted for ID:" + id); // Improved console log to show the ronda ID
 }
 
+
+
 function fakeEjecucionTrampolin() {
-  const allowedValues = [1, 2, 3, 4, 5, -1]; // -1 es NP
-  let new_arr = [];
-  for (let i = 0; i <= 9; i++) {
-    new_arr.push(shuffleArray(allowedValues)[0]);
-  }
-  new_arr.push(Math.floor(randRange(0, 10)));
-  return new_arr;
+  const allowedValuesSkills = [1, 2, 3, 4, 5, -1]; // -1 es NP
+  const allowedValuesLanding = [1,2,3,4,5,10]; // -1 es NP
+ 
+
+    let obj = {
+      'S1':shuffleArray(allowedValuesSkills)[0],
+      'S2':shuffleArray(allowedValuesSkills)[0],
+      'S3':shuffleArray(allowedValuesSkills)[0],
+      'S4':shuffleArray(allowedValuesSkills)[0],
+      'S5':shuffleArray(allowedValuesSkills)[0],
+      'S6':shuffleArray(allowedValuesSkills)[0],
+      'S7':shuffleArray(allowedValuesSkills)[0],
+      'S8':shuffleArray(allowedValuesSkills)[0],
+      'S9':shuffleArray(allowedValuesSkills)[0],
+      'S10':shuffleArray(allowedValuesSkills)[0],
+      'L':shuffleArray(allowedValuesLanding)[0]
+    }
+
+
+  return obj;
+}
+
+
+function fakeEjecucionMiniTrump() {
+  const allowedValuesSkills = [1, 2, 3, 4, 5, -1]; // -1 es NP
+  const allowedValuesLanding = [1,2,3,4,5,10]; // -1 es NP
+ 
+
+    let obj = {
+      'S1':shuffleArray(allowedValuesSkills)[0],
+      'S2':shuffleArray(allowedValuesSkills)[0],
+      'L':shuffleArray(allowedValuesLanding)[0]
+    }
+
+
+  return obj;
 }
 
 
@@ -137,8 +232,8 @@ const startServer = async () => {
     const rondasTrp = await getRondas('trp');
     processTrp(rondasTrp,'trp');
 
-    // const rondasDmt = await getRondas('dmt');
-    // process(rondasDmt,'dmt');
+    const rondasDmt = await getRondas('dmt');
+    processDmt(rondasDmt,'dmt');
 
     const rondasSin = await getRondas('sin');
     processTrp(rondasSin,'sin');
