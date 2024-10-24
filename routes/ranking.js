@@ -2,181 +2,124 @@ const express = require('express');
 const router = express.Router();
 const { ObjectId } = require('mongodb');
 
-function calcularRankingTrampolin(data) {
+function calcularRankingTrampolin(data,logos) {
   // Función para calcular la puntuación de un atleta
-  function calcularNotaEjecucion(scores) {
-      const ejecuciones = scores.filter(score => score.tipe === 'ejecucion');
-      const puntuaciones = [];
-
-      ejecuciones.forEach(ejecucion => {
-          const sScores = [];
-          const sNSkills = [];
-          for (let i = 1; i <= 10; i++) {
-            if(ejecucion.score[`S${i}`] != -1){
-              sScores.push(ejecucion.score[`S${i}`]);
-            }
-            else{
-              sNSkills.push(ejecucion.score[`S${i}`]);
-            }
-             
-          }
-
-
-          // Ordenamos las puntuaciones y eliminamos el mínimo y el máximo
-          sScores.sort((a, b) => a - b);
-          
-          if (sScores.length > 2) {
-              sScores.splice(0, 1); // Eliminar el mínimo
-              sScores.splice(-1, 1); // Eliminar el máximo
-          }
-
-          /*
-          si se hace por indices intermedios
-let midIndex1 = Math.floor((combinedArray.length - 1) / 2); // Primer índice intermedio
-let midIndex2 = midIndex1 + 1; // Segundo índice intermedio
-*/
-
-          const puntuacionEjecucion = sScores.reduce((a, b) => a + b, 0);
-
-          const nota = 200 - puntuacionEjecucion; // Nota final de ejecución
-
-          puntuaciones.push(nota);
-      });
-
-      return puntuaciones.reduce((a, b) => a + b, 0)/100; // Suma de todas las notas de ejecución
-  }
-
-  function calcularNotaDificultad(scores) {
-      const dificultades = scores.filter(score => score.tipe === 'dificultad');
-      return dificultades[0].score
-  }
-
-  function calcularNotaVuelo(scores) {
-      const vuelos = scores.filter(score => score.tipe === 'vuelo');
-      const notaVuelo = vuelos[0].score.vuelo;
-      const despHori = vuelos[0].score.desp_hori;
-      return notaVuelo + despHori; // Suma de notas de vuelo y desplazamiento horizontal
-  }
-
-  function calcularPenalizacion(scores) {
-      const penalizaciones = scores.filter(score => score.tipe === 'penalizacion');
-      return penalizaciones[0].score
-  }
-
-  const ranking = {};
-
-
-  data.forEach((item) => {
-      item.members.forEach(atleta => {
-        const atletaId = atleta._id.$oid;
-        const scores = item.scores.filter(score => score.gimnasta._id.$oid === atletaId);
-        const notaEjecucion = calcularNotaEjecucion(scores);
-        const notaDificultad = calcularNotaDificultad(scores);
-        const notaVuelo = calcularNotaVuelo(scores);
-        const penalizacion = calcularPenalizacion(scores);
-        let puntuacionTotal = notaEjecucion + notaDificultad + notaVuelo - penalizacion;
-        puntuacionTotal = puntuacionTotal.toFixed(3)    
-        ranking[`${atleta.firstName} ${atleta.lastName} ${atleta.name}||(${atleta.club})||${atleta.gender}`] = puntuacionTotal;
-    });
-  })
-
-  // Ordenamos el ranking por puntuación
-  const rankingOrdenado = Object.entries(ranking).sort((a, b) => b[1] - a[1]);
-
-  return rankingOrdenado;
-}
+  function calcularRankingTram(scores) {
   
-//
-
-function calcularRankingDoble(data) {
-  // Función para calcular la puntuación de un atleta
-  function calcularNotaEjecucion(scores) {
-      const ejecuciones = scores.filter(score => score.tipe === 'ejecucion');
-      const puntuaciones = [];
-
-      ejecuciones.forEach(ejecucion => {
-          const sScores = [];
-          const sNSkills = [];
-          for (let i = 1; i <= 2; i++) {
-            if(ejecucion.score[`S${i}`] != -1){
-              sScores.push(ejecucion.score[`S${i}`]);
-            }
-            else{
-              sNSkills.push(ejecucion.score[`S${i}`]);
-            }
-             
-          }
 
 
-          // Ordenamos las puntuaciones y eliminamos el mínimo y el máximo
-          sScores.sort((a, b) => a - b);
-          
-          if (sScores.length > 2) {
-              sScores.splice(0, 1); // Eliminar el mínimo
-              sScores.splice(-1, 1); // Eliminar el máximo
-          }
+    const numeroSkillsFilter = scores.filter(score => score.tipe === 'nsaltos')[0] || {}
+    const dificultadFilter = scores.filter(score => score.tipe === 'dificultad')[0] || {}
+    const tiempoVueloFilter = scores.filter(score => score.tipe === 'vuelo')[0] || {}
+    const penalizacionFilter = scores.filter(score => score.tipe === 'penalizacion')[0] || {}
+    
+    const numeroSkills = numeroSkillsFilter?.score || 0;
+    const dificultad = dificultadFilter?.score?.nota || 0;
+    const tiempoVuelo = tiempoVueloFilter?.score?.vuelo || 0;
+    const desplazamiento = tiempoVueloFilter?.score?.desp_hori || 0;
+    const penalizacion = penalizacionFilter?.score || 0; 
 
-          /*
-          si se hace por indices intermedios
-let midIndex1 = Math.floor((combinedArray.length - 1) / 2); // Primer índice intermedio
-let midIndex2 = midIndex1 + 1; // Segundo índice intermedio
-*/
+    console.log(scores[0])
 
-          const puntuacionEjecucion = sScores.reduce((a, b) => a + b, 0);
+    // const juez1 = [1,2,3,4,5,5,4,3,2,1,1]
+    // const juez2 = [2,2,3,4,5,5,4,3,2,1,2]
+    // const juez3 = [3,2,3,4,5,5,4,3,2,1,3]
+    // const juez4 = [4,2,3,4,5,5,4,3,2,1,4]
 
-          const nota = 800 - puntuacionEjecucion; // Nota final de ejecución
+    const juez1Filter = scores.filter(score => score.tipe === 'ejecucion' && score.juez == 1)[0] || {}
+    const juez2Filter = scores.filter(score => score.tipe === 'ejecucion' && score.juez == 2)[0] || {}
+    const juez3Filter = scores.filter(score => score.tipe === 'ejecucion' && score.juez == 3)[0] || {}
+    const juez4Filter = scores.filter(score => score.tipe === 'ejecucion' && score.juez == 4)[0] || {}
 
-          if(nota < 100){
-            nota  = 100;
-          }
+    const juez1 = Object.values(juez1Filter.score ?? {}) || [];
+    const juez2 = Object.values(juez2Filter.score ?? {}) || [];
+    const juez3 = Object.values(juez3Filter.score ?? {}) || [];
+    const juez4 = Object.values(juez4Filter.score ?? {}) || [];
 
-          puntuaciones.push(nota);
-      });
 
-      return puntuaciones.reduce((a, b) => a + b, 0)/100; // Suma de todas las notas de ejecución
+  
+    let landings = [juez1[10],juez2[10],juez3[10],juez4[10]]
+    landings =  landings.sort((a, b) => a - b);
+  
+    if (landings.length > 2) {
+        landings.splice(0, 1); // Eliminar el mínimo
+        landings.splice(-1, 1); // Eliminar el máximo
+    }
+  
+    const puntuacionLanding = landings.reduce((a, b) => a + b, 0)
+  
+    const skills = ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10']
+  
+    const puntuacionesTemporales = []
+  
+    for(let i = 0 ; i <= numeroSkills ; i++){
+        let data = [juez1[i],juez2[i],juez3[i],juez4[i]];
+  
+        data =  data.sort((a, b) => a - b);
+  
+        if (data.length > 2) {
+            data.splice(0, 1); // Eliminar el mínimo
+            data.splice(-1, 1); // Eliminar el máximo
+        }
+  
+        puntuacionesTemporales.push(data.reduce((a, b) => a + b, 0))
+        //puntuacionesTemporales.push(obj)  
+    }
+    
+    const sumaEjecucion = puntuacionesTemporales.reduce((a, b) => a + b, 0)+puntuacionLanding
+  
+    const toScore = numeroSkills*20/10
+    const putuacionTotalEjecucion = toScore-(sumaEjecucion/10)
+
+    const puntuacionFinal = ( putuacionTotalEjecucion
+        + dificultad 
+        + tiempoVuelo 
+        + desplazamiento)
+        -penalizacion
+  
+        
+        
+    return puntuacionFinal
+  
   }
 
-  function calcularNotaDificultad(scores) {
-      const dificultades = scores.filter(score => score.tipe === 'dificultad');
-      return dificultades[0].score
-  }
-
-  function calcularNotaVuelo(scores) {
-      const vuelos = scores.filter(score => score.tipe === 'vuelo');
-      const notaVuelo = vuelos[0].score.vuelo;
-      const despHori = vuelos[0].score.desp_hori;
-      return notaVuelo + despHori; // Suma de notas de vuelo y desplazamiento horizontal
-  }
-
-  function calcularPenalizacion(scores) {
-      const penalizaciones = scores.filter(score => score.tipe === 'penalizacion');
-      return penalizaciones[0].score
-  }
 
   const ranking = {};
 
-
   data.forEach((item) => {
       item.members.forEach(atleta => {
-        const atletaId = atleta._id.$oid;
-        const scores = item.scores.filter(score => score.gimnasta._id.$oid === atletaId);
-        const notaEjecucion = calcularNotaEjecucion(scores);
-        const notaDificultad = calcularNotaDificultad(scores);
-        const notaVuelo = calcularNotaVuelo(scores);
-        const penalizacion = calcularPenalizacion(scores);
-        let puntuacionTotal = notaEjecucion + notaDificultad + notaVuelo - penalizacion;
-        puntuacionTotal = puntuacionTotal.toFixed(3)    
-        ranking[`${atleta.firstName} ${atleta.lastName} ${atleta.name}||(${atleta.club})||${atleta.gender}`] = puntuacionTotal;
+        const atletaId = atleta._id;
+        const scores = item.scores.filter((score) => {
+          let atletaIdImp = new ObjectId(atletaId)
+          let scoreAtletaId =  new ObjectId(score.gimnasta._id)
+          if(atletaIdImp.equals(scoreAtletaId)){
+            return score
+          }
+        })
+
+        let puntuacionTotal = calcularRankingTram(scores);
+      
+        if (isNaN(puntuacionTotal)) {
+          puntuacionTotal = 0
+      }
+
+        puntuacionTotal = puntuacionTotal.toFixed(2)
+        const logo = logos.filter(logo => atleta.club === logo.name)[0]?.logo || 'default.png'
+        ranking[`${atleta.firstName} ${atleta.lastName}, ${atleta.name}||(${atleta.club})||${atleta.gender}||${logo}`] = puntuacionTotal;
     });
   })
 
   // Ordenamos el ranking por puntuación
   const rankingOrdenado = Object.entries(ranking).sort((a, b) => b[1] - a[1]);
-
-  return rankingOrdenado;
+ return rankingOrdenado;
 }
-//
-function calcularRankingSincro(data) { return }
+
+
+
+function calcularRankingSincro(data,logos) { return }
+function calcularRankingDoble(data,logos) { return }
+
+
 
 router.get('/:sport', async (req, res) => {
     const sport = req.params.sport;
@@ -187,18 +130,19 @@ router.get('/:sport', async (req, res) => {
     try {
 
         const rondas = await db.collection('rondas').find({ sport: sport }).toArray();
+        const logos = await db.collection('logos').find().toArray();
         
       switch (sport) {
         case 'trp':
-          rankings = calcularRankingTrampolin(rondas);
+          rankings = calcularRankingTrampolin(rondas,logos);
           break;
 
         case 'dmt':
-          rankings = calcularRankingDoble(rondas);
+          rankings = calcularRankingDoble(rondas,logos);
           break;
 
         case 'sin':
-          rankings = calcularRankingSincro(rondas);
+          rankings = calcularRankingSincro(rondas,logos);
           break;
       }
         

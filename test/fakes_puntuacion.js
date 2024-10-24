@@ -23,6 +23,7 @@ function processTrp(rondas) {
       let newScoreEntryEjecucion = {};
       for (let i = 1; i <= 4; i++) {
         newScoreEntryEjecucion = {
+          _id: new ObjectId(),
           tipe: 'ejecucion',
           gimnasta: member,
           score: fakeEjecucionTrampolin(),
@@ -35,6 +36,7 @@ function processTrp(rondas) {
       }
 
       const newScoreEntryDificultad = {
+        _id: new ObjectId(),
         tipe: 'dificultad',
         gimnasta: member,
         score: fakeDificultadTrampolin(),
@@ -46,6 +48,7 @@ function processTrp(rondas) {
       puntuaciones.push(newScoreEntryDificultad);
 
       const newScoreEntryVuelo = {
+        _id: new ObjectId(),
         tipe: 'vuelo',
         gimnasta: member,
         score: fakeVueloTrampolin(),
@@ -57,6 +60,7 @@ function processTrp(rondas) {
       puntuaciones.push(newScoreEntryVuelo);
 
       const newScoreEntryPenalizacion = {
+        _id: new ObjectId(),
         tipe: 'penalizacion',
         gimnasta: member,
         score: fakePenalizacionTrampolin(),
@@ -66,14 +70,25 @@ function processTrp(rondas) {
         date: new Date(),
       };
       puntuaciones.push(newScoreEntryPenalizacion); // Add Penalizacion score
+
+
+      const newScoreEntryNskills = {
+        _id: new ObjectId(),
+        tipe: 'nsaltos',
+        gimnasta: member,
+        score: fakeNumSkills(),
+        verified: true,
+        salto: null,
+        juez: 1,
+        date: new Date(),
+      };
+      puntuaciones.push(newScoreEntryNskills); // Add Penalizacion score
     });
 
     // Insert scores in DB for each ronda
     saveScore(puntuaciones, ronda._id);
   });
 }
-
-
 
 function processDmt(rondas) {
   rondas.forEach(ronda => {
@@ -83,6 +98,7 @@ function processDmt(rondas) {
           let newScoreEntryEjecucion = {};
           for (let i = 1; i <= 4; i++) {
             newScoreEntryEjecucion = {
+              _id: new ObjectId(),
               tipe: 'ejecucion',
               gimnasta: member,
               score: fakeEjecucionMiniTrump(),
@@ -95,6 +111,7 @@ function processDmt(rondas) {
           }
     
           const newScoreEntryDificultad = {
+            _id: new ObjectId(),
             tipe: 'dificultad',
             gimnasta: member,
             score: fakeDificultadTrampolin(),
@@ -106,6 +123,7 @@ function processDmt(rondas) {
           puntuaciones.push(newScoreEntryDificultad);
     
           const newScoreEntryVuelo = {
+            _id: new ObjectId(),
             tipe: 'vuelo',
             gimnasta: member,
             score: fakeVueloTrampolin(),
@@ -117,6 +135,7 @@ function processDmt(rondas) {
           puntuaciones.push(newScoreEntryVuelo);
     
           const newScoreEntryPenalizacion = {
+            _id: new ObjectId(),
             tipe: 'penalizacion',
             gimnasta: member,
             score: fakePenalizacionTrampolin(),
@@ -203,6 +222,14 @@ function fakeDificultadTrampolin() {
 function fakePenalizacionTrampolin() {
   return parseFloat(randRange(0, 10));
 }
+
+function fakeNumSkills() {
+  return Math.round(randRange(0, 10));
+}
+
+
+
+
 
 // Helper functions
 function randRange(min, max) {
