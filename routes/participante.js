@@ -74,7 +74,31 @@ router.get('/config-participante/:sport', async (req, res) => {
   }
 });
 
+router.get('/config-salto-participante/:uuid', async (req, res) => {
+  const { uuid } = req.params; // Obtener el ID de los parámetros de la ruta
+  const db = req.db;
 
+
+
+  try {
+
+    const config = await db.collection('sensores').findOne({ 'config.uuid': uuid });
+   
+
+    // Verificar si la configuración existe
+    if (!config) { // Cambiado a !config
+      return res.status(404).send({ message: 'No se encontraron configuración para este deporte' });
+    }
+
+    res.status(200).send({
+      message: 'esta es la config del salto',
+      config: config // Cambiado a config._id
+    });
+  } catch (error) {
+    
+      return res.status(404).send({ message: 'No se encontraron configuración para este deporte' });
+  }
+});
 
 
 router.get('/', async (req, res) => {

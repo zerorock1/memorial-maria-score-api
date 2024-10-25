@@ -12,7 +12,7 @@ app.use(helmet());
 // sin barra al final
 const corsOptions = {
   //origin: 'https://www.memorialmariahg.org',
-  origin: 'http://192.168.1.38:3000',
+  origin: 'http://192.168.1.190:3000',
   //origin: '*',
   
   
