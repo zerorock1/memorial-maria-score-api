@@ -64,6 +64,23 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+
+router.get('/members/:name', async (req, res) => {
+  const { name } = req.params;
+  const db = req.db;
+
+  try {
+    const team = await db.collection('teams').findOne({ name: name });
+    if (!team) return res.status(404).send('Equipo no encontrado');
+    res.status(200).send(team.members);
+  } catch (error) {
+    res.status(400).send({
+      message: 'Error al obtener el equipo',
+      error: error.message
+    });
+  }
+});
+
 // Actualizar un equipo por ID
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
